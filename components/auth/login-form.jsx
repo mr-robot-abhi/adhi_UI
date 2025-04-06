@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useAuth } from "@/context/auth-context"
+import { useAuth } from "@/context/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -25,11 +25,10 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      await login(email, password)
-      router.push("/dashboard")
+      const success = await login(email, password)
+      if (!success) throw new Error("Login failed")
     } catch (error) {
-      console.error("Login error:", error)
-      setError("Invalid email or password. Please try again.")
+      setError(error.message || "Invalid email or password")
     } finally {
       setIsLoading(false)
     }
@@ -41,10 +40,8 @@ export function LoginForm() {
 
     try {
       await loginWithGoogle()
-      router.push("/dashboard")
     } catch (error) {
-      console.error("Google login error:", error)
-      setError("Google login failed. Please try again.")
+      setError(error.message || "Google login failed")
     } finally {
       setIsLoading(false)
     }
